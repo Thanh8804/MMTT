@@ -9,7 +9,7 @@ name: Deploy Jekyll site to Pages
 on:
   push:
     branches: ["main"]
-  pull_request: # This will publish a site preview on every pull request, and also run the build command to test if the site is broken.
+    pull_request: # This will publish a site preview on every pull request, and also run the build command to test if the site is broken.
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -38,21 +38,22 @@ jobs:
           ruby-version: '3.2' # Not needed with a .ruby-version file
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
+      
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
+      
       - name: Build with Jekyll
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
-        if: github.event_name == 'push'
 
-      - name: Build with Jekyll for PR preview
-        run: bundle exec jekyll build --baseurl "/preview/${{ github.event.number }}"
+      - name: Build PR preview website
+        if: github.ref != 'refs/heads/main'
+        run: bundle exec jekyll build --baseURL "/${{ env.PR_PATH }}"
         env:
           JEKYLL_ENV: staging
-        if: github.event_name == 'pull_request'
 
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
@@ -66,13 +67,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
-        if: github.event_name == 'push'
-      - name: Deploy PR preview to GitHub Pages
-        id: deployment-pr
-        uses: actions/deploy-pages@v2
-        if: github.event_name == 'pull_request'
+      - name: Comment on PR
+        if: github.ref != 'refs/heads/main'
+        uses: hasura/comment-progress@v2.2.0
         with:
-          destination_dir: "preview/${{ github.event.number }}"  
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          number: ${{ github.event.number }}
+          id: deploy-preview
+          message: "A preview of the changes has been deployed and can be viewed here: https://${{ github.repository }}.github.io/${{ env.PR_PATH }}"
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/deploy-pages@v2
+      
+      - name: Deploy Pr preview
+        github.ref != 'refs/heads/main'
+        uses: actions/deploy-pages@v2
+        with:
+          destination_dir: ${{ env.PR_PATH }} # TODO you need to set this if you're using a custom domain. Otherwise you can remove it.

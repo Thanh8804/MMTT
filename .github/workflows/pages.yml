@@ -9,7 +9,7 @@ name: Deploy Jekyll site to Pages
 on:
   push:
     branches: ["main"]
-
+  pull_request: # This will publish a site preview on every pull request, and also run the build command to test if the site is broken.
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -31,6 +31,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -45,6 +46,14 @@ jobs:
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+        if: github.event_name == 'push'
+
+      - name: Build with Jekyll for PR preview
+        run: bundle exec jekyll build --baseurl "/preview/${{ github.event.number }}"
+        env:
+          JEKYLL_ENV: staging
+        if: github.event_name == 'pull_request'
+
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
@@ -60,3 +69,10 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
+        if: github.event_name == 'push'
+      - name: Deploy PR preview to GitHub Pages
+        id: deployment-pr
+        uses: actions/deploy-pages@v2
+        if: github.event_name == 'pull_request'
+        with:
+          destination_dir: "preview/${{ github.event.number }}"  

@@ -1,25 +1,17 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 # Sample workflow for building and deploying a Jekyll site to GitHub Pages
 name: Deploy Jekyll site to Pages
 
 on:
   push:
     branches: ["main"]
-    pull_request: # This will publish a site preview on every pull request, and also run the build command to test if the site is broken.
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  pull_request: # This will publish a site preview on every pull request
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -35,17 +27,20 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
+          ruby-version: '3.2'
+          bundler-cache: true
+          cache-version: 0
       
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
+
+      - name: Set PR Path
+        if: github.event_name == 'pull_request'
+        run: echo "PR_PATH=${{ github.event.number }}" >> $GITHUB_ENV
       
       - name: Build with Jekyll
         if: github.ref == 'refs/heads/main'
-        # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
@@ -57,7 +52,6 @@ jobs:
           JEKYLL_ENV: staging
 
       - name: Upload artifact
-        # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
 
   # Deployment job
@@ -82,8 +76,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v2
       
-      - name: Deploy Pr preview
-        github.ref != 'refs/heads/main'
+      - name: Deploy PR preview
+        if: github.ref != 'refs/heads/main'
         uses: actions/deploy-pages@v2
         with:
           destination_dir: ${{ env.PR_PATH }} # TODO you need to set this if you're using a custom domain. Otherwise you can remove it.

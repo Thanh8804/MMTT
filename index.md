@@ -8,7 +8,7 @@ nav_order: 0
 
 {: .fs-9 }
 
-Kho tài liệu học tập UIT phieen
+Kho tài liệu học tập UIT phien ban
 
 {: .fs-6 .fw-300 }
 

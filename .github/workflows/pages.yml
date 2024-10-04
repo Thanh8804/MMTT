@@ -65,15 +65,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Comment on PR
-        if: github.ref != 'refs/heads/main'
-        uses: hasura/comment-progress@v2.2.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          number: ${{ github.event.number }}
-          id: deploy-preview
-          message: "A preview of the changes has been deployed and can be viewed here: https://${{ github.repository }}.github.io/${{ env.PR_PATH }}"
+      # - name: Comment on PR
+      #   if: github.ref != 'refs/heads/main'
+      #   uses: hasura/comment-progress@v2.2.0
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     repository: ${{ github.repository }}
+      #     number: ${{ github.event.number }}
+      #     id: deploy-preview
+      #     message: "A preview of the changes has been deployed and can be viewed here: https://${{ github.repository }}.github.io/${{ env.PR_PATH }}"
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'

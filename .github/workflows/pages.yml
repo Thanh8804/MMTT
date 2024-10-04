@@ -18,11 +18,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  env:
-    PR_PATH: pull/${{github.event.number}}
   # Build job
   build:
     runs-on: ubuntu-latest
+    env:
+      PR_PATH: pull/${{github.event.number}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -66,6 +66,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      PR_PATH: pull/${{github.event.number}}
     needs: build
     steps:
       - name: Comment on PR

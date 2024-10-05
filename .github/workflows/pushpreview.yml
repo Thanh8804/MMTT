@@ -28,7 +28,6 @@ jobs:
 
       - name: Build site
         run: |
-          cd docs
           gem install bundler
           bundle install
           bundle exec jekyll build
@@ -36,6 +35,6 @@ jobs:
       - name: Generate preview
         uses: PushLabsHQ/pushpreview-action@1.0.6
         with:
-            source-directory: ./docs/_site
+            source-directory: ./_site
             github-token: ${{ secrets.GITHUB_TOKEN }}
             pushpreview-token: ${{ secrets.PUSHPREVIEW_TOKEN }}

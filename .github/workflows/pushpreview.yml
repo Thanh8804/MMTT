@@ -6,6 +6,11 @@ on:
     types:
       - labeled
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+      
 jobs:
   preview:
     runs-on: ubuntu-latest

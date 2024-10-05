@@ -21,16 +21,17 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-            ruby-version: '3.2' # Adjust the Ruby version as needed for your project
+            ruby-version: '3.2' # Not needed with a .ruby-version file
+            bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+            cache-version: 0 # Increment this number if you need to re-download cached gems
 
       - name: Set BASE_URL
         run: echo "BASE_URL=/github/${{ github.repository }}/${{ github.event.number }}/" >> $GITHUB_ENV
 
-      - name: Build site
-        run: |
-          gem install bundler
-          bundle install
-          bundle exec jekyll build
+      - name: Build with jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env: 
+            JEKYLL_ENV: production
 
       - name: Generate preview
         uses: PushLabsHQ/pushpreview-action@1.0.6

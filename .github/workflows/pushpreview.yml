@@ -1,51 +1,63 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
 
-name: PushPreview
-
+# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+name: Deploy Jekyll site to Pages preview environment
 on:
+  # Runs on pull requests targeting the default branch
   pull_request_target:
-    types:
-      - labeled
-
+    branches: ["main"]
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
-  pull-requests: write
-
+# Allow only one concurrent deployment per PR, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
+  group: 'pages-preview @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: false
 jobs:
-  preview:
+  # Build job
+  build:
+    # Limit permissions of the GITHUB_TOKEN for untrusted code
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'preview'
     steps:
-      - uses: actions/checkout@v3
-      - name: Comment
-        run: |
-          gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body "⚙️ Hang tight! PushPreview is currently building your preview. We'll share the URL as soon as it's ready."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Checkout
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
         with:
-            ruby-version: '3.2' # Not needed with a .ruby-version file
-            bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-            cache-version: 0 # Increment this number if you need to re-download cached gems
-
-      - name: Set BASE_URL
-        run: echo "BASE_URL=/github/${{ github.repository }}/${{ github.event.number }}/" >> $GITHUB_ENV
-
-      - name: Build with jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
-        env: 
-            JEKYLL_ENV: production
-
-      - name: Generate preview
-        uses: PushLabsHQ/pushpreview-action@1.0.6
+          # For PRs make sure to checkout the PR branch
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Setup Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
         with:
-            source-directory: ./_site
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            pushpreview-token: ${{ secrets.PUSHPREVIEW_TOKEN }}
+          source: ./
+          destination: ./_site
+      - name: Upload artifact
+        # Automatically uploads an artifact from the './_site' directory by default
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+  # Deployment job
+  deploy:
+    environment:
+      name: 'Pages Preview'
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        with:
+          preview: 'true'

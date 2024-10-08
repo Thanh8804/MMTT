@@ -35,10 +35,10 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - name: Move up two directories
+        run: cd ../../ # Lui về 2 thư mục
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
-        run: |
-          cd ../../
         with:
           source: ./
           destination: ./_site

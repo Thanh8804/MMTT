@@ -43,7 +43,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v3
       - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}/pull/ ${{ github.event.pull_request.number }}"
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
       - name: Upload artifact
@@ -53,7 +53,7 @@ jobs:
   deploy:
     environment:
       name: Pages Preview
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}/pull/${{ github.event.number }}
     # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read

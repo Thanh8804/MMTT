@@ -53,7 +53,7 @@ jobs:
   deploy:
     environment:
       name: Pages Preview
-      url: ${{ steps.deployment.outputs.page_url }}/pull/${{ github.event.number }}
+      url: ${{ steps.deployment.outputs.page_url }}pull/${{ github.event.number }}
     # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
     permissions:
       contents: read

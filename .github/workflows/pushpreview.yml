@@ -70,3 +70,4 @@ jobs:
         uses: actions/deploy-pages@v3
         with:
           preview: 'true'
+          artifact_name: github-pages-${{ github.event.pull_request.number }}-${{ github.run_id }}

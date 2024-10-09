@@ -54,7 +54,7 @@ jobs:
   deploy:
     environment:
       name: github-pages-${{ github.event.pull_request.number }}
-      url: ${{ steps.deployment.outputs.page_url }} 
+      url: ${{ steps.deployment.outputs.page_url }}/pull/${{ github.event.number }}
     runs-on: ubuntu-latest
     needs: build
     steps:

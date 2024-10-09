@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages-${{ github.event.pull_request.number }}-${{ github.run_id }}
-          path: "./_site"
+          path: ./_site
   # Deployment job
   deploy:
     environment:

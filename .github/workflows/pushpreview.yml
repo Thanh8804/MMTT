@@ -51,7 +51,9 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages-${{ github.event.pull_request.number }}-${{ github.run_id }}
-          path: ./_site
+      - name: List uploaded artifacts
+        run: ls -la ./_site
+        
   # Deployment job
   deploy:
     environment:
@@ -69,5 +71,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v3
         with:
-          preview: 'true'
-          artifact_name: github-pages-${{ github.event.pull_request.number }}-${{ github.run_id }}
+          artifact_name: "github-pages-${{ github.event.pull_request.number }}-${{ github.run_id }}"

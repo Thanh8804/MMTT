@@ -8,7 +8,7 @@ nav_order: 0
 
 {: .fs-9 }
 
-Kho tài liệu Mạng máy tính 
+Kho tài liệu Mạng máy tính và Truyền Thông 
 
 {: .fs-6 .fw-300 }
 

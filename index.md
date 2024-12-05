@@ -8,7 +8,7 @@ nav_order: 0
 
 {: .fs-9 }
 
-Kho tài liệu học tập UIT, phiên bản Mạng máy tính và
+Kho tài liệu Mạng mays
 
 {: .fs-6 .fw-300 }
 
